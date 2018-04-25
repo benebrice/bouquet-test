@@ -1,0 +1,14 @@
+= render partial: 'orders/navigation_week', locals: {from_week: @from_week, analysis_type: 'products'}
+
+table
+  thead
+    tr
+      td Product Name
+      td Order
+      td Created_at
+  tbody
+    - @products.each do |product|
+      tr
+        td = product.name
+        td = @orders.select{|o| o.product_id == product.id}.count
+        td = I18n.localize(@orders.select{|o| o.product_id == product.id}.first.created_at)

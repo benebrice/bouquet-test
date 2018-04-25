@@ -1,0 +1,13 @@
+= render partial: 'orders/navigation_week', locals: {from_week: @from_week, analysis_type: 'items'}
+
+table
+  tr
+    td Product Name
+    td Order
+    td Created_at
+  - @items.each do |item|
+    - item_orders = @orders.select{|o| o.items.where(id: item.id) }
+    tr
+      td = item.name
+      td = item.product_items.map(&:quantity).sum
+      td = I18n.localize(item_orders.first.created_at)
