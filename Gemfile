@@ -24,6 +24,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'devise'
+gem 'slim'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -39,6 +40,7 @@ group :development, :test do
   gem 'byebug'
   gem 'faker'
   gem 'hirb'
+  gem 'awesome_print'
 end
 
 group :development do
