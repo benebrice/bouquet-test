@@ -1,5 +1,5 @@
 class Order < ActiveRecord::Base
-  has_one :product
+  belongs_to :product
 
   enum status: [:daft, :confirmed, :canceled]
 end
