@@ -8,7 +8,7 @@ namespace :db do
     system("bin/rails db:environment:set RAILS_ENV=#{ENV['RAILS_ENV']}")
     Rake::Task['db:drop'].invoke
     Rake::Task['db:create'].invoke
-    Rake::Task['db:schema:load'].invoke
+    #Rake::Task['db:schema:load'].invoke
     Rake::Task['db:migrate'].invoke
     Rake::Task['db:seed'].invoke
   end
