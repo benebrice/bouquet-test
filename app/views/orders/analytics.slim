@@ -1,3 +1,7 @@
-= render partial: 'orders/analytics_by_items/table' if @items
-= render partial: 'orders/analytics_by_products/table' if @products
+= link_to 'Return Home', root_path
+br
+br
+#analytics
+  = render partial: 'orders/analytics_by_items/table' if @items
+  = render partial: 'orders/analytics_by_products/table' if @products
     
