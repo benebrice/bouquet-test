@@ -5,4 +5,8 @@ class OrdersController < ApplicationController
     h = {my_val_1: {my_val_2: {'my_val_3': 666}}}
     puts h.dig(:my_val_1, :my_val_2, :my_val_3)
   end
+
+  def analytics
+    
+  end
 end
