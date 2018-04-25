@@ -6,7 +6,10 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-user = Customer.create(email: 'test@bergamotte.com', password: 'Bergamotte_2018!!', password_confirmation: 'Bergamotte_2018!!')
+user = Customer.create(email: 'test@bergamotte.com', 
+  password: 'Bergamotte_2018!!', 
+  password_confirmation: 'Bergamotte_2018!!', 
+  first_name: Faker::Name.first_name)
 
 5.times do
   Category.create!(name: Faker::Commerce.product_name)

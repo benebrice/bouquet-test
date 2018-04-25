@@ -11,12 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180425094300) do
+ActiveRecord::Schema.define(version: 20180425100009) do
 
   create_table "categories", force: :cascade do |t|
-    t.string   "category_name", null: false
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "customers", force: :cascade do |t|
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20180425094300) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.string   "first_name"
   end
 
   add_index "customers", ["email"], name: "index_customers_on_email", unique: true
@@ -58,10 +59,11 @@ ActiveRecord::Schema.define(version: 20180425094300) do
   end
 
   create_table "products", force: :cascade do |t|
-    t.string   "name",                     null: false
-    t.float    "price",      default: 0.0
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.string   "name",                      null: false
+    t.float    "price",       default: 0.0
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "category_id"
   end
 
 end
