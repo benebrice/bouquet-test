@@ -8,13 +8,18 @@
 
 user = Customer.create(email: 'test@bergamotte.com', password: 'Bergamotte_2018!!', password_confirmation: 'Bergamotte_2018!!')
 
+5.times do
+  Category.create!(name: Faker::Commerce.product_name)
+end
+
 15.times do
   Item.create!(name: Faker::Commerce.material)
 end
 
 item_ids = Item.pluck(:id)
 30.times do
-  p = Product.create(name: Faker::Book.title, price: Faker::Commerce.price)
+  # Create a product and assign it to a random category (id between 1-5)
+  p = Product.create(name: Faker::Book.title, price: Faker::Commerce.price, category_id: rand(1..4))
   item_ids.sample(rand(5) + 2).each do |item_id|
     p.product_items.create!(item_id: item_id, quantity: (rand(10) + 1) )
   end
