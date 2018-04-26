@@ -49,11 +49,23 @@ class OrdersController < ApplicationController
     month_customer_first_order_sql = "SELECT strftime('%m', datetime(created_at)) as order_month, customer_id, min(created_at) AS 'first_order_on_month', max(created_at) AS 'last_order_on_month'
                                       FROM orders
                                       GROUP BY customer_id"
-    sql = "SELECT order_month, count(*) AS recurring_customer, (#{global_order_count_sql}) AS 'total_orders'
-          FROM 
-            (#{month_customer_first_order_sql})
-          group by order_month
-          HAVING strftime('%m', datetime(first_order_on_month)) <= order_month"
+    customer_first_order_sql = "SELECT customer_id, min(created_at) AS 'first_order_on_month'
+                                FROM orders
+                                group by customer_id"
+    orders_by_customer_by_month = "SELECT CAST(strftime('%m', datetime(created_at)) as int) as order_month, customer_id, count(*) as total_customer_order
+                                  FROM orders o1  
+                                  GROUP BY customer_id, order_month"
+    sql = "SELECT order_month, count(*) as 'recurrence_customers', sum(total_orders) as 'orders_on_month'
+            FROM
+              (SELECT order_month, A.customer_id, sum(total_customer_order) AS 'total_orders', first_order_on_month
+                FROM 
+                  (#{orders_by_customer_by_month}) A
+                LEFT JOIN
+                  (#{customer_first_order_sql}) B
+                ON A.customer_id = B.customer_id
+                GROUP BY order_month, A.customer_id)
+            GROUP BY order_month
+            HAVING COUNT(CAST(strftime('%m', datetime(first_order_on_month)) as int) < order_month)"
 
     @recurrences = ActiveRecord::Base.connection.execute(sql)
   end
@@ -61,6 +73,7 @@ class OrdersController < ApplicationController
   private
 
   def find_orders
+    # @orders  = current_customer.orders.confirmed.order(created_at: :desc)
     @orders  = Order.confirmed.order(created_at: :desc)
   end
 
