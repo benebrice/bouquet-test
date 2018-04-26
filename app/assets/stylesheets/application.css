@@ -17,3 +17,11 @@
 table, th, td {
    border: 1px solid black;
 }
+
+.inline{
+  display: inline-block;
+}
+
+.left-margin-100{
+  margin-left: 100px;
+}
