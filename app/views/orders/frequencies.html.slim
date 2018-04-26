@@ -1,0 +1,13 @@
+table
+  thead
+    tr
+      td Number of orders
+      td Number of customers
+      td '%'
+  tbody
+
+    - @frequencies.each do |f|
+      tr
+        td = f['order_count']
+        td = f['customer_count']
+        td = "#{f['customer_count'].to_f / f['total_orders'].to_i * 100} %"

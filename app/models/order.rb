@@ -1,5 +1,6 @@
 class Order < ActiveRecord::Base
   belongs_to :product
+  belongs_to :customer
   has_many :items, through: :product
 
   enum status: [:daft, :confirmed, :canceled]

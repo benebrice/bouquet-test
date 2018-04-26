@@ -4,4 +4,5 @@ Rails.application.routes.draw do
   root "orders#index"
 
   get :analytics, controller: :orders
+  get :frequencies, controller: :orders
 end
