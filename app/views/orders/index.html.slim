@@ -1,22 +1,11 @@
 h1 Orders...
 
-= link_to analytics_path(analysis_type: 'products') do
-  | See Analytics by Products
+= link_to analytics_path do
+  | See Analytics
 br
-= link_to analytics_path(analysis_type: 'items') do
-  | See Analytics by Items
-br
+
 = link_to frequencies_path do
   | See frequencies
 
 = link_to recurrence_path do
   | See month recurrence
-
-table
-  tr
-    td Product Name
-    td Status
-  - @orders.each do |order|
-    tr
-      td = order.product.name
-      td = order.status

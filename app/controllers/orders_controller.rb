@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   before_action :find_orders, :week_paramters
-  before_action :weeks_filter, only: :analytics
+  before_action :count_older_orders, :weeks_filter, only: :analytics
 
   def index
     h = {my_val_1: {my_val_2: {'my_val_3': 666}}}
@@ -11,7 +11,10 @@ class OrdersController < ApplicationController
     case params[:analysis_type]
     when 'items'
       @items = @orders.includes(:items).map(&:items).uniq.flatten
+    when 'products'
+      @products = @orders.includes(:product).map(&:product).uniq
     else
+      @items = @orders.includes(:items).map(&:items).uniq.flatten
       @products = @orders.includes(:product).map(&:product).uniq
     end
     respond_to do |format|
@@ -58,12 +61,17 @@ class OrdersController < ApplicationController
   private
 
   def find_orders
-    @orders  = current_customer.orders.confirmed.order(created_at: :desc)
+    @orders  = Order.confirmed.order(created_at: :desc)
   end
 
   def week_paramters
     @from_week = params[:from_week].present? ? params[:from_week].to_i : 1
     @to_week = params[:to_week].present? ? params[:to_week].to_i : 0    
+  end
+
+  def count_older_orders
+    @older_orders_counter = @orders.before(@to_week).count
+    
   end
 
   def weeks_filter

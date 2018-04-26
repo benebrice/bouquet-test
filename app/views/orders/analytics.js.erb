@@ -1,5 +1,6 @@
 <% if @items %>
-  $('#analytics').html("<%= escape_javascript(render partial: 'orders/analytics_by_items/table') %>");
-<% elsif @products %>
-  $('#analytics').html("<%= escape_javascript(render partial: 'orders/analytics_by_products/table') %>");
+  $('#analytics .items').html("<%= escape_javascript(render partial: 'orders/analytics_by_items/table') %>");
+<% end %>
+<% if @products %>
+  $('#analytics .products').html("<%= escape_javascript(render partial: 'orders/analytics_by_products/table') %>");
 <% end %>

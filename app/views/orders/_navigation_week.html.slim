@@ -1,9 +1,13 @@
-= link_to Rails.application.routes.url_helpers.send("#{route}_path", from_week: from_week + 1, to_week: from_week, analysis_type: analysis_type), remote: true do
-  = "See #{route} by #{analysis_type} (week before)"
+h3 = "Orders from #{month_displayer(@from_week)} to #{month_displayer(@to_week)} (#{@older_orders_counter} behind)"
+br
+br
+- unless @older_orders_counter.zero?
+  = link_to Rails.application.routes.url_helpers.send("#{route}_path", from_week: from_week + 1, to_week: from_week, analysis_type: analysis_type), remote: true do
+    = "See #{route} by #{analysis_type} (week before)"
 br
 br
 - if @from_week - 1 > 0
-  = link_to Rails.application.routes.url_helpers.send("#{route}_path", from_week: from_week - 1, to_week: from_week - 2, analysis_type: analysis_type) do
+  = link_to Rails.application.routes.url_helpers.send("#{route}_path", from_week: from_week - 1, to_week: from_week - 2, analysis_type: analysis_type), remote: true do
     = "See #{route} by #{analysis_type} (week after)"
 
 br
