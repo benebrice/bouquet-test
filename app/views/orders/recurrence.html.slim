@@ -1,0 +1,15 @@
+table
+  thead
+    tr
+      td Month
+      td Reccuring Customer
+      td New customer
+      td Total
+  tbody
+
+    - @recurrences.each do |r|
+      tr
+        td = r['order_month']
+        td = r['recurring_customer']
+        td = r['total_orders'].to_i - r['recurring_customer'].to_i
+        td = r['total_orders']

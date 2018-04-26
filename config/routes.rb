@@ -5,4 +5,6 @@ Rails.application.routes.draw do
 
   get :analytics, controller: :orders
   get :frequencies, controller: :orders
+  get :recurrence, controller: :orders
+  
 end

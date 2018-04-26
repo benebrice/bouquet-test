@@ -36,8 +36,23 @@ class OrdersController < ApplicationController
             (#{freq_order_count})
           GROUP BY order_count
           ORDER BY order_count"
-    ap sql
     @frequencies = ActiveRecord::Base.connection.execute(sql)
+  end
+
+  def recurrence
+    global_order_count_sql = "SELECT count(id) AS 'all_orders'
+                              FROM orders"
+
+    month_customer_first_order_sql = "SELECT strftime('%m', datetime(created_at)) as order_month, customer_id, min(created_at) AS 'first_order_on_month', max(created_at) AS 'last_order_on_month'
+                                      FROM orders
+                                      GROUP BY customer_id"
+    sql = "SELECT order_month, count(*) AS recurring_customer, (#{global_order_count_sql}) AS 'total_orders'
+          FROM 
+            (#{month_customer_first_order_sql})
+          group by order_month
+          HAVING strftime('%m', datetime(first_order_on_month)) <= order_month"
+
+    @recurrences = ActiveRecord::Base.connection.execute(sql)
   end
 
   private
