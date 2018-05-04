@@ -1,21 +1,20 @@
+# Order service to generate
+#  - Analysis of orders
+#  - Frequencies on orders
+#  - Reccurences on orders
 class OrderService
-  attr_reader :analysis_type, 
-              :items, 
+  attr_reader :items,
               :products,
-              :from_week,
-              :to_week, 
               :options
 
   def initialize(current_customer, options = {})
     @current_customer = current_customer
-    sanitize_type(options.delete(:analysis_type))
-    sanitize_options(options)
-    load_filters
-    init_arrays
+    @options = self.class.sanitize_options(options)
+    @orders = Order.none
   end
 
   def load_orders
-    @orders = find_orders(@options[:global_orders])
+    @orders = find_orders
     apply_filter
   end
 
@@ -29,7 +28,7 @@ class OrderService
     @products = @orders.includes(:product).map(&:product).uniq
   end
 
-  def load_both
+  def load_all
     load_items
     load_products
   end
@@ -39,117 +38,122 @@ class OrderService
   end
 
   def apply_filter
-    @orders.weeks_ago(@from_week, @to_week) unless no_filter?
+    @orders.weeks_ago(*@options.values_at(:from_week, :to_week)) unless no_filter?
   end
 
   def no_filter?
-    [@options[:from_week], @options[:to_week]].compact.count.zero?
-  end
+    @options.values_at(:from_week, :to_week).compact.count.zero?
+  end 
 
   private
 
-  def find_orders(global = false)
-    current_customer.orders
-                    .confirmed
-                    .order(created_at: :desc) unless global
+  def find_orders
+    if @current_customer
+      return current_customer.orders
+                             .confirmed
+                             .order(created_at: :desc)
+    end
+
     Order.confirmed
-         .order(created_at: :desc) if global
+         .order(created_at: :desc)
   end
 
-  def init_arrays
-    @orders = Order.none
-    @products = nil
-    @items = nil
+  class << self
+    def sanitize_options(options)
+      type = options[:analysis_type]
+      options[:analysis_type] = %w[items products].include?(type) ? type : 'all'
+      sanitize_date_filter(options, [{ param_name: :from_week, default_value: 1 },
+                                     { param_name: :to_week, default_value: 0 }])
+    end
+
+    def sanitize_date_filter(options, params)
+      params.each do |param_hash|
+        param_name = param_hash[:param_name]
+        options[param_name] = integer_with_default_value(options[param_name], param_hash[:default_value])
+      end
+      options
+    end
+
+    def integer_with_default_value(val, default_val)
+      val ? val.to_i : default_val
+    end
   end
 
-  def sanitize_type(type)
-    @analysis_type = ['items', 'products'].include?(type) ? type : 'both'
-  end
-
-  def sanitize_options(options)
-    options[:from_week] = options[:from_week].present? ? options[:from_week].to_i : 1
-    options[:to_week] = options[:to_week].present? ? options[:to_week].to_i : 1
-    @options = options
-  end
-
-  def load_filters
-    @from_week = @options[:from_week]
-    @to_week = @options[:to_week]
-  end
-
+  # Generate frequancies table from orders
   class Frequency
     class << self
-      def total_orders(with_execution = false)
-        sql = "SELECT count(id) AS 'all_orders' FROM orders"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
-      end
-
-      def total_orders_by_customer_table(with_execution = false)
-        sql = "SELECT count(*) AS 'order_count', customer_id
-                            FROM orders o
-                            GROUP BY customer_id
-                            ORDER BY 'order_count'"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
-      end
-
       # global_order_count_sql = "SELECT count(id) AS 'all_orders'
-      #                           FROM orders 
+      #                           FROM orders
       #                           WHERE created_at > '#{@from_week.week.ago.utc.to_s(:db)}'
       #                           AND created_at < '#{@to_week.week.ago.utc.to_s(:db)}'"
-      def frequencies_table(with_execution = false)
+      def frequencies_table
         sql = "SELECT order_count, count(*) AS 'customer_count', (#{total_orders}) AS 'total_orders'
               FROM
                 (#{total_orders_by_customer_table})
               GROUP BY order_count
               ORDER BY order_count"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
+        execute_sql(sql)
       end
 
       def execute_sql(sql)
         ActiveRecord::Base.connection.execute(sql)
+      end
+
+      private
+
+      def total_orders
+        "SELECT count(id) AS 'all_orders' FROM orders"
+      end
+
+      def total_orders_by_customer_table
+        "SELECT count(*) AS 'order_count', customer_id
+         FROM orders o
+         GROUP BY customer_id
+         ORDER BY 'order_count'"
       end
     end
   end
 
+  # Generate recurrences tbale from orders
   class Recurrence
     class << self
-      def orders_by_customer_by_month_table(with_execution = false)
-        sql = "SELECT CAST(strftime('%m', datetime(created_at)) as int) as order_month, customer_id, count(*) as total_customer_order
-                                    FROM orders o1  
-                                    GROUP BY customer_id, order_month"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
-      end
-
-      def customer_first_order_table(with_execution = false)
-        sql = "SELECT customer_id, min(created_at) AS 'first_order_on_month'
-                                FROM orders
-                                group by customer_id"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
-      end
-
-      def recurrences_table(with_execution = false)
+      def recurrences_table
         sql = "SELECT order_month, count(*) as 'recurrence_customers', sum(total_orders) as 'orders_on_month'
               FROM
-                (SELECT order_month, A.customer_id, sum(total_customer_order) AS 'total_orders', first_order_on_month
-                  FROM 
-                    (#{orders_by_customer_by_month_table}) A
-                  LEFT JOIN
-                    (#{customer_first_order_table}) B
-                  ON A.customer_id = B.customer_id
-                  GROUP BY order_month, A.customer_id)
+                (#{customer_orders_by_months_table})
               GROUP BY order_month
               HAVING COUNT(CAST(strftime('%m', datetime(first_order_on_month)) as int) < order_month)"
-        return sql unless with_execution
-        execute_sql(sql) if with_execution
+        execute_sql(sql)
       end
 
       def execute_sql(sql)
         ActiveRecord::Base.connection.execute(sql)
+      end
+
+      private
+
+      def orders_by_customer_by_month_table
+        "SELECT CAST(strftime('%m', datetime(created_at)) as int) as order_month,
+                customer_id,
+                count(*) as total_customer_order
+         FROM orders o1
+         GROUP BY customer_id, order_month"
+      end
+
+      def customer_first_order_table
+        "SELECT customer_id, min(created_at) AS 'first_order_on_month'
+                                FROM orders
+                                group by customer_id"
+      end
+
+      def customer_orders_by_months_table
+        "SELECT order_month, A.customer_id, sum(total_customer_order) AS 'total_orders', first_order_on_month
+         FROM
+          (#{orders_by_customer_by_month_table}) A
+         LEFT JOIN
+          (#{customer_first_order_table}) B
+         ON A.customer_id = B.customer_id
+         GROUP BY order_month, A.customer_id"
       end
     end
   end
