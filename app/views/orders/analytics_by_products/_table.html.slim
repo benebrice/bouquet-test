@@ -8,7 +8,8 @@ table
       td Created_at
   tbody
     - @products.each do |product|
+      - first_order = @orders.select{|o| o.product_id == product.id}.first
       tr
         td = product.name
         td = @orders.select{|o| o.product_id == product.id}.count
-        td = I18n.localize(@orders.select{|o| o.product_id == product.id}.first.created_at)
+        td = I18n.localize(first_order.created_at) if first_order

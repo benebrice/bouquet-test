@@ -7,7 +7,8 @@ table
     td Created_at
   - @items.each do |item|
     - item_orders = @orders.select{|o| o.items.where(id: item.id) }
+    - first_order = item_orders.first
     tr
       td = item.name
       td = item.product_items.map(&:quantity).sum
-      td = I18n.localize(item_orders.first.created_at)
+      td = I18n.localize(first_order.created_at) if first_order
