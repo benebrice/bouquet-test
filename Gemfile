@@ -40,7 +40,10 @@ group :development, :test do
   gem 'byebug'
   gem 'faker'
   gem 'hirb'
+  gem 'rubocop'
+  gem 'reek'
   gem 'awesome_print'
+  gem 'rspec-rails'
 end
 
 group :development do
