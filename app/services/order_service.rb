@@ -121,7 +121,7 @@ class OrderService
   class Recurrence
     class << self
       def recurrences_table(_without_execution = false)
-        execute_sql(sql)
+        execute_sql(recurrences)
       end
 
       def execute_sql(sql)

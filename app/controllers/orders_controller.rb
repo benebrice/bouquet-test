@@ -22,7 +22,7 @@ class OrdersController < ApplicationController
     @frequencies = OrderService::Frequency.frequencies_table
   end
 
-  def recurrence
+  def recurrences
     @recurrences = OrderService::Recurrence.recurrences_table
   end
 
