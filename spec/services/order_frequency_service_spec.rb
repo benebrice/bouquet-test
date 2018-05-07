@@ -1,22 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe OrderService::Frequency do
-  
   subject(:frequency_service) { OrderService::Frequency }
 
-  let(:res) { OrderService::Frequency.execute_sql(sql) } 
+  let(:res) { OrderService::Frequency.execute_sql(sql) }
 
-  let(:customerA) { create(:customer) }
-  let(:customerB) { create(:customer) } 
-  let(:order1_A) { create(:order, product_id: 1, customer_id: customerA.id) }
-  let(:order2_A) { create(:order, product_id: 1, customer_id: customerA.id) }
+  let(:customer_a) { create(:customer) }
+  let(:customer_b) { create(:customer) }
+  let(:order1_a) { create(:order, product_id: 1, customer_id: customer_a.id) }
+  let(:order2_a) { create(:order, product_id: 1, customer_id: customer_a.id) }
 
-  let(:order1_B) { create(:order, product_id: 1, customer_id: customerB.id) }
-  
+  let(:order1_b) { create(:order, product_id: 1, customer_id: customer_b.id) }
+
   before do
-    order1_A
-    order2_A
-    order1_B
+    order1_a
+    order2_a
+    order1_b
   end
 
   describe 'total_orders' do
@@ -38,14 +37,14 @@ RSpec.describe OrderService::Frequency do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Frequency.send(:total_orders_by_customer_table)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['order_count', 'customer_id']
+    it_behaves_like 'an sql response', shared_sql, %w[order_count customer_id]
 
     it 'returns number of orders per customer' do
-      frequencyA = res.select{|hash| hash['customer_id'] == customerA.id}.first
-      expect(frequencyA['order_count']).to eq(customerA.orders.count)
+      frequency_a = res.select { |hash| hash['customer_id'] == customer_a.id }.first
+      expect(frequency_a['order_count']).to eq(customer_a.orders.count)
 
-      frequencyB = res.select{|hash| hash['customer_id'] == customerB.id}.first
-      expect(frequencyB['order_count']).to eq(customerB.orders.count)
+      frequency_b = res.select { |hash| hash['customer_id'] == customer_b.id }.first
+      expect(frequency_b['order_count']).to eq(customer_b.orders.count)
     end
   end
 
@@ -53,6 +52,6 @@ RSpec.describe OrderService::Frequency do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Frequency.send(:frequencies)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['order_count', 'customer_count', 'total_orders']
+    it_behaves_like 'an sql response', shared_sql, %w[order_count customer_count total_orders]
   end
 end

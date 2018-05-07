@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
   end
 
   def analytics
-    #service = OrderService.new(current_customer, generate_options)
+    # service = OrderService.new(current_customer, generate_options)
     service = OrderService.new(nil, generate_options)
     @orders = service.load_orders
     service.send("load_#{service.options[:analysis_type]}")

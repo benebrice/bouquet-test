@@ -44,7 +44,7 @@ class OrderService
 
   def no_filter?
     @options.values_at(:from_week, :to_week).compact.count.zero?
-  end 
+  end
 
   private
 
@@ -120,7 +120,7 @@ class OrderService
   # Generate recurrences tbale from orders
   class Recurrence
     class << self
-      def recurrences_table(without_execution = false)
+      def recurrences_table(_without_execution = false)
         execute_sql(sql)
       end
 

@@ -9,7 +9,7 @@ shared_examples_for 'an sql query' do |sql|
 end
 
 shared_examples_for 'an sql response' do |sql, keys|
-  let(:res) { OrderService::Recurrence.execute_sql(sql) } 
+  let(:res) { OrderService::Recurrence.execute_sql(sql) }
 
   it 'validates SQL response' do
     expect(res).to be_a(Array)
@@ -17,10 +17,10 @@ shared_examples_for 'an sql response' do |sql, keys|
     expect(res.first).to be_a(Hash)
     res.each do |r|
       keys.each do |key|
-        expect(r.has_key?(key)).to be_truthy
+        expect(r.key?(key)).to be_truthy
       end
     end
-  end 
+  end
 end
 
 shared_examples_for 'a sub query' do |sql, sub_sql|

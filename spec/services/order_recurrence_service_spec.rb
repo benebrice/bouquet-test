@@ -1,22 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe OrderService::Recurrence do
-  
   subject(:recurrence_service) { OrderService::Recurrence }
 
-  let(:res) { OrderService::Recurrence.execute_sql(sql) } 
+  let(:res) { OrderService::Recurrence.execute_sql(sql) }
 
-  let(:customerA) { create(:customer) }
-  let(:customerB) { create(:customer) } 
-  let(:order1_A) { create(:order, product_id: 1, customer_id: customerA.id) }
-  let(:order2_A) { create(:order, product_id: 1, customer_id: customerA.id) }
+  let(:customer_a) { create(:customer) }
+  let(:customer_b) { create(:customer) }
+  let(:order1_a) { create(:order, product_id: 1, customer_id: customer_a.id) }
+  let(:order2_a) { create(:order, product_id: 1, customer_id: customer_a.id) }
 
-  let(:order1_B) { create(:order, product_id: 1, customer_id: customerB.id) }
-  
+  let(:order1_b) { create(:order, product_id: 1, customer_id: customer_b.id) }
+
   before do
-    order1_A
-    order2_A
-    order1_B
+    order1_a
+    order2_a
+    order1_b
   end
 
   describe 'customer_first_order_table' do
@@ -25,7 +24,7 @@ RSpec.describe OrderService::Recurrence do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Recurrence.send(:customer_first_order_table)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['customer_id', 'first_order_on_month']
+    it_behaves_like 'an sql response', shared_sql, %w[customer_id first_order_on_month]
 
     it 'returns the date of the first order of every customer' do
       res.each do |r|
@@ -41,7 +40,7 @@ RSpec.describe OrderService::Recurrence do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Recurrence.send(:orders_by_customer_by_month_table)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['order_month', 'customer_id', 'total_customer_order']
+    it_behaves_like 'an sql response', shared_sql, %w[order_month customer_id total_customer_order]
 
     it 'returns number of orders per customer per month' do
       res.each do |r|
@@ -57,7 +56,7 @@ RSpec.describe OrderService::Recurrence do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Recurrence.send(:customer_orders_by_months_table)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['order_month', 'customer_id', 'total_orders', 'first_order_on_month']
+    it_behaves_like 'an sql response', shared_sql, %w[order_month customer_id total_orders first_order_on_month]
 
     it_behaves_like 'a sub query', shared_sql, OrderService::Recurrence.send(:orders_by_customer_by_month_table)
     it_behaves_like 'a sub query', shared_sql, OrderService::Recurrence.send(:customer_first_order_table)
@@ -74,6 +73,6 @@ RSpec.describe OrderService::Recurrence do
     # Let `sql` is not avaible outside an `it`.
     shared_sql = OrderService::Recurrence.send(:recurrences)
     it_behaves_like 'an sql query', shared_sql
-    it_behaves_like 'an sql response', shared_sql, ['order_month', 'recurrence_customers', 'orders_on_month']
+    it_behaves_like 'an sql response', shared_sql, %w[order_month recurrence_customers orders_on_month]
   end
 end
