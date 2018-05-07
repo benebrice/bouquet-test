@@ -1,3 +1,5 @@
+# app/controllers/orders_controller.rb
+# Controller of orders
 class OrdersController < ApplicationController
   def index
     h = { my_val_1: { my_val_2: { 'my_val_3': 666 } } }
@@ -5,8 +7,8 @@ class OrdersController < ApplicationController
   end
 
   def analytics
-    # service = OrderService.new(current_customer, generate_options)
     service = OrderService.new(nil, generate_options)
+    # service = OrderService.new(current_customer, generate_options)
     @orders = service.load_orders
     service.send("load_#{service.options[:analysis_type]}")
 

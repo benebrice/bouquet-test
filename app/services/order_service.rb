@@ -6,6 +6,7 @@ class OrderService
   attr_reader :orders,
               :items,
               :products,
+              :order_before,
               :options
 
   def initialize(current_customer = nil, options = {})
@@ -16,6 +17,7 @@ class OrderService
 
   def load_orders
     @orders = find_orders
+    @order_before = @orders.before(@options[:to_week]).count
     apply_filter
   end
 
@@ -32,10 +34,6 @@ class OrderService
   def load_all
     load_items
     load_products
-  end
-
-  def order_before
-    @orders.before(@options[:to_week]).count
   end
 
   def apply_filter
@@ -120,7 +118,7 @@ class OrderService
   # Generate recurrences tbale from orders
   class Recurrence
     class << self
-      def recurrences_table(_without_execution = false)
+      def recurrences_table
         execute_sql(recurrences)
       end
 

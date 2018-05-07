@@ -1,3 +1,5 @@
+# app/models/order.rb
+# Order made by a customer
 class Order < ActiveRecord::Base
   belongs_to :product
   belongs_to :customer
