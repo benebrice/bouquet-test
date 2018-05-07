@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5.1'
 # Use sqlite3 as the database for Active Record
@@ -37,18 +36,18 @@ gem 'slim'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'awesome_print'
   gem 'byebug'
   gem 'faker'
   gem 'hirb'
-  gem 'rubocop'
   gem 'reek'
-  gem 'awesome_print'
   gem 'rspec-rails'
+  gem 'rubocop'
 end
 
 group :test do
+  gem 'factory_bot_rails'
   gem 'shoulda-matchers', '~> 3.1'
-  gem 'factory_bot'
 end
 
 group :development do
