@@ -22,12 +22,10 @@ class OrderService
   end
 
   def load_items
-    return if @orders.count.zero?
     @items = @orders.includes(:items).map(&:items).flatten.uniq
   end
 
   def load_products
-    return if @orders.count.zero?
     @products = @orders.includes(:product).map(&:product).uniq
   end
 
