@@ -8,7 +8,7 @@ class OrderService
               :products,
               :options
 
-  def initialize(current_customer, options = {})
+  def initialize(current_customer = nil, options = {})
     @current_customer = current_customer
     @options = self.class.sanitize_options(options)
     @orders = Order.none
@@ -21,7 +21,7 @@ class OrderService
 
   def load_items
     return if @orders.count.zero?
-    @items = @orders.includes(:items).map(&:items).uniq.flatten
+    @items = @orders.includes(:items).map(&:items).flatten.uniq
   end
 
   def load_products
@@ -39,7 +39,7 @@ class OrderService
   end
 
   def apply_filter
-    @orders.weeks_ago(*@options.values_at(:from_week, :to_week)) unless no_filter?
+    @orders = @orders.weeks_ago(*@options.values_at(:from_week, :to_week)) unless no_filter?
   end
 
   def no_filter?
@@ -55,8 +55,7 @@ class OrderService
                              .order(created_at: :desc)
     end
 
-    Order.confirmed
-         .order(created_at: :desc)
+    Order.confirmed.order(created_at: :desc)
   end
 
   class << self
@@ -87,14 +86,8 @@ class OrderService
       #                           FROM orders
       #                           WHERE created_at > '#{@from_week.week.ago.utc.to_s(:db)}'
       #                           AND created_at < '#{@to_week.week.ago.utc.to_s(:db)}'"
-      def frequencies_table(without_execution = false)
-        sql = "SELECT order_count, count(*) AS 'customer_count', (#{total_orders}) AS 'total_orders'
-              FROM
-                (#{total_orders_by_customer_table})
-              GROUP BY order_count
-              ORDER BY order_count"
-        return execute_sql(sql) unless without_execution
-        sql
+      def frequencies_table
+        execute_sql(frequencies)
       end
 
       def execute_sql(sql)
@@ -113,6 +106,14 @@ class OrderService
          GROUP BY customer_id
          ORDER BY 'order_count'"
       end
+
+      def frequencies
+        "SELECT order_count, count(*) AS 'customer_count', (#{total_orders}) AS 'total_orders'
+              FROM
+                (#{total_orders_by_customer_table})
+              GROUP BY order_count
+              ORDER BY order_count"
+      end
     end
   end
 
@@ -120,13 +121,7 @@ class OrderService
   class Recurrence
     class << self
       def recurrences_table(without_execution = false)
-        sql = "SELECT order_month, count(*) as 'recurrence_customers', sum(total_orders) as 'orders_on_month'
-              FROM
-                (#{customer_orders_by_months_table})
-              GROUP BY order_month
-              HAVING COUNT(CAST(strftime('%m', datetime(first_order_on_month)) as int) < order_month)"
-        return execute_sql(sql) unless without_execution
-        sql
+        execute_sql(sql)
       end
 
       def execute_sql(sql)
@@ -157,6 +152,14 @@ class OrderService
           (#{customer_first_order_table}) B
          ON A.customer_id = B.customer_id
          GROUP BY order_month, A.customer_id"
+      end
+
+      def recurrences
+        "SELECT order_month, count(*) as 'recurrence_customers', sum(total_orders) as 'orders_on_month'
+              FROM
+                (#{customer_orders_by_months_table})
+              GROUP BY order_month
+              HAVING COUNT(CAST(strftime('%m', datetime(first_order_on_month)) as int) < order_month)"
       end
     end
   end

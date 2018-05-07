@@ -70,8 +70,9 @@ RSpec.describe OrderService::Recurrence do
     end
   end
 
-  describe 'recurrences_table' do
-    shared_sql = OrderService::Recurrence.send(:recurrences_table, true)
+  describe 'recurrences' do
+    # Let `sql` is not avaible outside an `it`.
+    shared_sql = OrderService::Recurrence.send(:recurrences)
     it_behaves_like 'an sql query', shared_sql
     it_behaves_like 'an sql response', shared_sql, ['order_month', 'recurrence_customers', 'orders_on_month']
   end

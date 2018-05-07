@@ -17,7 +17,7 @@ class Order < ActiveRecord::Base
     where('created_at > ?', date.to_i.week.ago)
   }
 
-  scope :confirmed, -> { where( status: 'confirmed')}
+  scope :confirmed, -> { where( status: 1)}
 
   scope :from_month, -> (month) {
     date = Time.zone.now.change(month: month)

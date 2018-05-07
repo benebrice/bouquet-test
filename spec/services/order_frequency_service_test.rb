@@ -49,11 +49,9 @@ RSpec.describe OrderService::Frequency do
     end
   end
 
-  describe 'frequencies_table' do
-    let(:res) { frequency_service.frequencies_table }
-
+  describe 'frequencies' do
     # Let `sql` is not avaible outside an `it`.
-    shared_sql = OrderService::Frequency.send(:frequencies_table, true)
+    shared_sql = OrderService::Frequency.send(:frequencies)
     it_behaves_like 'an sql query', shared_sql
     it_behaves_like 'an sql response', shared_sql, ['order_count', 'customer_count', 'total_orders']
   end
