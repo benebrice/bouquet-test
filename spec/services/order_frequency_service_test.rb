@@ -22,20 +22,10 @@ RSpec.describe OrderService::Frequency do
   describe 'total_orders' do
     let(:sql) { frequency_service.send(:total_orders) }
 
-    it 'returns a String containing SELECT and FROM' do
-      expect(sql).to be_a(String)
-      expect(sql).to include('SELECT', 'FROM')
-    end
-
-    it 'returns an Array of Hash (min 1 element)' do
-      expect(res).to be_a(Array)
-      expect(res.count).to be > 0
-      expect(res.first).to be_a(Hash)
-    end
-
-    it 'returns a Hash with key `all_orders`' do
-      expect(res.first.has_key?('all_orders')).to be_truthy
-    end
+    # Let `sql` is not avaible outside an `it`.
+    shared_sql = OrderService::Frequency.send(:total_orders)
+    it_behaves_like 'an sql query', shared_sql
+    it_behaves_like 'an sql response', shared_sql, ['all_orders']
 
     it 'returns the number of all orders' do
       expect(res.first['all_orders']).to eq(Order.count)
@@ -45,23 +35,10 @@ RSpec.describe OrderService::Frequency do
   describe 'total_orders_by_customer_table' do
     let(:sql) { frequency_service.send(:total_orders_by_customer_table) }
 
-    it 'returns a String containing SELECT and FROM' do
-      expect(sql).to be_a(String)
-      expect(sql).to include('SELECT', 'FROM')
-    end
-
-    it 'returns an Array of Hash (min 1 element)' do
-      expect(res).to be_a(Array)
-      expect(res.count).to be > 0
-      expect(res.first).to be_a(Hash)
-    end
-
-    it 'returns a hashes with both keys `order_count` and `customer_id`' do
-      res.each do |r|
-        expect(r.has_key?('order_count')).to be_truthy
-        expect(r.has_key?('customer_id')).to be_truthy
-      end
-    end
+    # Let `sql` is not avaible outside an `it`.
+    shared_sql = OrderService::Frequency.send(:total_orders_by_customer_table)
+    it_behaves_like 'an sql query', shared_sql
+    it_behaves_like 'an sql response', shared_sql, ['order_count', 'customer_id']
 
     it 'returns number of orders per customer' do
       frequencyA = res.select{|hash| hash['customer_id'] == customerA.id}.first
@@ -75,18 +52,9 @@ RSpec.describe OrderService::Frequency do
   describe 'frequencies_table' do
     let(:res) { frequency_service.frequencies_table }
 
-    it 'returns an Array of Hash (min 1 element)' do
-      expect(res).to be_a(Array)
-      expect(res.count).to be > 0
-      expect(res.first).to be_a(Hash)
-    end
-
-    it 'returns a hashes with both keys `order_count` and `customer_id`' do
-      res.each do |r|
-        expect(r.has_key?('order_count')).to be_truthy
-        expect(r.has_key?('customer_count')).to be_truthy
-        expect(r.has_key?('total_orders')).to be_truthy
-      end
-    end
+    # Let `sql` is not avaible outside an `it`.
+    shared_sql = OrderService::Frequency.send(:frequencies_table, true)
+    it_behaves_like 'an sql query', shared_sql
+    it_behaves_like 'an sql response', shared_sql, ['order_count', 'customer_count', 'total_orders']
   end
 end
