@@ -44,6 +44,7 @@ group :development, :test do
   gem 'reek'
   gem 'awesome_print'
   gem 'rspec-rails'
+  gem 'factory_bot_rails', '~> 4.0'
 end
 
 group :development do

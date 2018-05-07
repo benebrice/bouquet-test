@@ -3,7 +3,8 @@
 #  - Frequencies on orders
 #  - Reccurences on orders
 class OrderService
-  attr_reader :items,
+  attr_reader :orders,
+              :items,
               :products,
               :options
 
@@ -86,13 +87,14 @@ class OrderService
       #                           FROM orders
       #                           WHERE created_at > '#{@from_week.week.ago.utc.to_s(:db)}'
       #                           AND created_at < '#{@to_week.week.ago.utc.to_s(:db)}'"
-      def frequencies_table
+      def frequencies_table(without_execution = false)
         sql = "SELECT order_count, count(*) AS 'customer_count', (#{total_orders}) AS 'total_orders'
               FROM
                 (#{total_orders_by_customer_table})
               GROUP BY order_count
               ORDER BY order_count"
-        execute_sql(sql)
+        return execute_sql(sql) unless without_execution
+        sql
       end
 
       def execute_sql(sql)
@@ -117,13 +119,14 @@ class OrderService
   # Generate recurrences tbale from orders
   class Recurrence
     class << self
-      def recurrences_table
+      def recurrences_table(without_execution = false)
         sql = "SELECT order_month, count(*) as 'recurrence_customers', sum(total_orders) as 'orders_on_month'
               FROM
                 (#{customer_orders_by_months_table})
               GROUP BY order_month
               HAVING COUNT(CAST(strftime('%m', datetime(first_order_on_month)) as int) < order_month)"
-        execute_sql(sql)
+        return execute_sql(sql) unless without_execution
+        sql
       end
 
       def execute_sql(sql)
