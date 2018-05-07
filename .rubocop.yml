@@ -1,0 +1,67 @@
+# rubocop --auto-gen-config
+# inherit_from: .rubocop_todo.yml
+# convention, warning, error or fatal
+#require: rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.2.6
+  DisplayCopNames: true
+  Include:
+    - '**/Gemfile'
+    - '**/Rakefile'
+    - '**/config.ru'
+  Exclude:
+    - bin/**/*
+    - db/schema.rb
+    - db/data/**/*
+    - docs/**/*
+    - test/**/*
+    #- db/migrate/*
+
+Documentation:
+  Enabled: false
+
+Rails:
+  Enabled: true
+
+Metrics/LineLength:
+  Max: 130
+  Enabled: true
+  Exclude:
+    - vendor/engines/*/spec/**/module_swagger_spec.rb
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# https://stackoverflow.com/a/41187163
+Metrics/BlockLength:
+  Exclude:
+    # - 'Rakefile'
+    # - '**/*.rake'
+    - 'config/Guardfile'
+    - 'spec/**/*_spec.rb'
+    - 'vendor/engines/*/spec/**/*_spec.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'db/migrate/*.rb'
+    - 'vendor/engines/*/db/migrate/*.rb'
+
+Metrics/ModuleLength:
+   Exclude:
+    - 'spec/**/*_spec.rb'
+    - 'vendor/engines/*/spec/**/*_spec.rb'
+
+Naming/FileName:
+  Exclude:
+    - 'config/Guardfile'
+
+RSpec/ExampleLength:
+  Max: 10 # Tolerance
+
+RSpec/ExpectActual:
+  Exclude:
+  - vendor/engines/*/spec/routing/**/*
+
+RSpec/MultipleExpectations:
+  Max: 5 # Tolerance
