@@ -6,9 +6,9 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-Customer.create(email: 'test@bergamotte.com',
-                password: 'Bergamotte_2018!!',
-                password_confirmation: 'Bergamotte_2018!!',
+Customer.create(email: 'test@xx.com',
+                password: 'XX_2018!!',
+                password_confirmation: 'XX_2018!!',
                 first_name: Faker::Name.first_name)
 
 69.times do

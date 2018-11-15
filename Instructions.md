@@ -1,8 +1,8 @@
-This is a coding exercise used by Bergamotte for technical recruitment purposes. There are no limit of time to perform this task nor any particular restriction, however, please spend no more than six consecutive hours.
+This is a coding exercise used by XX for technical recruitment purposes. There are no limit of time to perform this task nor any particular restriction, however, please spend no more than six consecutive hours.
 
 ## Instructions
 
-Please send a zip archive containing your code and any relevant materials in an email along with your resume and motivations to [jobs@bergamotte.com](jobs@bergamotte.com). Include a readme file explaining your assumptions, providing any necessary assumptions, and stating  what you would accomplish with more time.
+Please send a zip archive containing your code and any relevant materials in an email along with your resume and motivations to [jobs@xx.com](jobs@xx.com). Include a readme file explaining your assumptions, providing any necessary assumptions, and stating  what you would accomplish with more time.
 
 The purpose of this test is to verify your abilities to code and see how you architecture an application, so this is the time to show everything you know that is applicable and relevant.
 

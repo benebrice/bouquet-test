@@ -136,7 +136,7 @@ This can be updated on the file `app/controllers/orders_controller.rb` on the `a
 		app/services/order_service.rb
 		app/views/orders/frequencies.html.slim
 		app/views/orders/index.html.slim
-		app/views/orders/recurrence.html.slim
+		app/views/orders/recurrences.html.slim
 		config/routes.rb
 		db/seeds.rb
 		```
@@ -225,6 +225,6 @@ What is tested:
 Code cleaning was made by using `rubocop` and `reek`
 
 # Improvements
-* Add tests for scopes
+* Add tests for scopes and model association dependencies on delete/destroy
 * Use `Redis` to cache results
 * Use workers to calculate results each hour/day/week/month/year
